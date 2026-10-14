@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 class SkillPolicyTest(unittest.TestCase):
     def test_autoselection_is_default(self):
         text=(ROOT/'SKILL.md').read_text(encoding='utf-8')
-        self.assertIn('用户只需给 arXiv 链接',text)
+        self.assertIn('用户已经明确调用 Kelip 后',text)
         self.assertIn('由当前讲解目标自动选',text)
         self.assertIn('亲眼看像素',text)
         self.assertIn('不要求用户提供 Figure 编号',text)

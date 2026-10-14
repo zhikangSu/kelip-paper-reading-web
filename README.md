@@ -1,10 +1,18 @@
-# kelip-paper-reading-web
+# Kelip · 论文精读（GitHub：kelip-paper-reading-web）
 
 ChatGPT 网页端论文精读 Skill，由 [skJack/kelip-paper-reading](https://github.com/skJack/kelip-paper-reading)（MIT）适配。保留六站精读、原图检查、样本/张量解释和只读代码核对，新增离线 HTML、可恢复 ZIP、Google Drive 与原生 Google Sheets 索引。
 
+## 显式调用（v0.2.4）
+
+**默认不自动启动。** 首次进入 Kelip 工作流必须在用户消息中明确说“用 Kelip ...”“调用 Kelip ...”，或在 ChatGPT 的 Skill 选择器里主动选择 Kelip。仅发论文链接、上传 PDF、让 GPT 讲解/总结/比较论文，均走普通 ChatGPT，不触发六阶段脚本或 Drive 归档。
+
+原完整名称 `kelip-paper-reading-web` 仍可作为**明确调用时的旧别名**。在同一对话中已开启 Kelip 并阅读同一篇论文后，“继续”“解释这个公式”“归档”可沿用当前阅读状态而不用重复点名。新的论文需要重新明确调用。
+
+**重要：名称改为 `kelip` 后，安装时可能被识别为一项新 Skill。请移除或停用旧版 `kelip-paper-reading-web`，避免旧版宽泛描述继续自动触发。** 通过 Skill 名称和描述做路由属于模型判断，不是产品级的强制手动开关；需要用新对话检查误触发。
+
 ## 安装
 
-下载已构建的 **kelip-paper-reading-web-0.2.3.zip**，在你已有的 Plugins / Skills 本地上传入口安装。包内只有一个 Skill 文件夹，顶层包含 SKILL.md。以平台实际安全扫描结果为准；源码 ZIP 不是带依赖的安装包。
+下载已构建的 **kelip-paper-reading-web-0.2.4.zip**，在你已有的 Plugins / Skills 本地上传入口安装。包内只有一个 Skill 文件夹，顶层包含 SKILL.md。以平台实际安全扫描结果为准；源码 ZIP 不是带依赖的安装包。
 
 无需在自己的电脑安装 Python、搭服务器或申请 Google API 密钥。脚本由 ChatGPT 的实际执行环境运行，云端操作使用已连接的 Google Drive。安装 Skill 不会自动授予新服务权限。
 
@@ -21,7 +29,8 @@ GitHub Actions 自动测试并产出安装包、源码包和测试日志，可�
 ## 用法
 
 ```text
-带我精读这篇 <arXiv 链接>，先讲动机。
+用 Kelip 精读 <arXiv 链接>，先讲动机。
+# 以下在已经启动的同一篇论文对话中使用
 直接讲数据：一条训练样本是什么样？
 这篇先到这里，把笔记和问答归档到 Google Drive。
 继续读 arXiv:2410.24164，上次讲到哪里？
@@ -39,7 +48,7 @@ GitHub Actions 自动测试并产出安装包、源码包和测试日志，可�
 
 ## 默认无负担精读和旁支提问（v0.2.3）
 
-用户只要发送“精读这篇”加 arXiv 链接或 PDF。Skill 自己根据章节挑选相关原图、核对 PDF 图号/图注/页码/视觉内容，正确后展示；不要求用户指定 Figure 编号或提供配图审核要求。临时插问不推进六阶段阅读，用户说“继续”后接着原阅读位置。普通网页版尚无由 Skill 自建的独立侧边问答 UI；分支聊天与本会话问答并非自动同步。
+用户明确调用 Kelip 后，只需提供 arXiv 链接或 PDF。Skill 自己根据章节挑选相关原图、核对 PDF 图号/图注/页码/视觉内容，正确后展示；不要求用户指定 Figure 编号或提供配图审核要求。临时插问不推进六阶段阅读，用户说“继续”后接着原阅读位置。普通网页版尚无由 Skill 自建的独立侧边问答 UI；分支聊天与本会话问答并非自动同步。
 
 ## 存储
 

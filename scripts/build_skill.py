@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def build(out):
     out = Path(out).resolve(); out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='skill-build-') as td:
-        skill = Path(td) / 'kelip-paper-reading-web'; skill.mkdir()
+        skill = Path(td) / 'kelip'; skill.mkdir()
         for name in ['SKILL.md', 'README.md', 'README.en.md', 'LICENSE', 'VERSION', 'requirements.txt', 'profile.example.md']:
             shutil.copyfile(ROOT / name, skill / name)
         for folder in ['scripts', 'references']:
