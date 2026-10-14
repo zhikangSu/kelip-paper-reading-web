@@ -4,7 +4,7 @@ ChatGPT 网页端论文精读 Skill，由 [skJack/kelip-paper-reading](https://g
 
 ## 安装
 
-下载已构建的 **kelip-paper-reading-web-0.2.0.zip**，在你已有的 Plugins / Skills 本地上传入口安装。包内只有一个 Skill 文件夹，顶层包含 SKILL.md。以平台实际安全扫描结果为准；源码 ZIP 不是带依赖的安装包。
+下载已构建的 **kelip-paper-reading-web-0.2.2.zip**，在你已有的 Plugins / Skills 本地上传入口安装。包内只有一个 Skill 文件夹，顶层包含 SKILL.md。以平台实际安全扫描结果为准；源码 ZIP 不是带依赖的安装包。
 
 无需在自己的电脑安装 Python、搭服务器或申请 Google API 密钥。脚本由 ChatGPT 的实际执行环境运行，云端操作使用已连接的 Google Drive。安装 Skill 不会自动授予新服务权限。
 
@@ -31,8 +31,10 @@ GitHub Actions 自动测试并产出安装包、源码包和测试日志，可�
 
 默认一站一站讲，可打断和跳站。结束或暂停时询问一次是否归档；已经明确要求保存就直接执行，不每轮自动上传。部分完成也可保存。
 
-## 图像展示改进（v0.2.1）
+## 图像展示与编号验证（v0.2.2）
 增加 references/figure-delivery.md 与 scripts/prepare_figure.py：论文 Figure 必须先显示原始图像，再讲内容。脚本从 figures/index.json 定位 PNG，自动裁剪不准时支持 PDF 页预览和手动坐标重裁。
+新版绑定图片、原始 PDF 页和准确 Figure caption，采用 PDF 重渲染而非来源不明的网页首图或缓存 PNG；无法核对时不再冒名展示。
+
 引用链接、路径或图注不能当作图片已经发送。若平台当前没有用户可见的图像输出工具，必须明确告知未内嵌图片并提供已验证图片附件。prepared != displayed。
 
 ## 存储

@@ -4,6 +4,16 @@
 
 **图像交付成功的唯一标准：用户可见的消息中实际渲染了经确认的论文原图或截图。** 图片名、URL、引用来源、图片路径、Python 打印出的文件路径，以及“图1左/中/右”文字描述都不是图像交付。不得说“请看上图/图已发出”，除非确实调用了用户可见图像输出工具并得到图像结果。
 
+## 强制绑定图像、编号、caption 与源页
+
+当前已复现的一类错误：OpenWAM 官网三栏 Infra / Study / α 总览是 Figure 1，但一次回答却把它标为 Figure 12，并给出另一个真实 Figure 12 的网页链接。这是像素来源与编号链接各自检索造成的错配，不能仅靠“看图正确”来避免。
+
+- 对指定 Figure N，首选论文原版 PDF；从 figures/index.json 读取准确的 N、PDF 页码、caption 和 bbox，运行 prepare_figure.py。该脚本须在原 PDF 页上核对准确 caption，再从同一页重新生成 PNG，返回带 PDF/image SHA-256 的单条证据记录。不要把原来的缓存 PNG 直接当成可认证图像。
+- 图片内容和编号必须复用同一次解析结果。最终消息实际展示的必须是该 image_path 的 PNG；展示文字直接取其 Figure number、caption 和 pdf_page，不允许再独立搜索图像并重新配图注。
+- 禁止将通用图像搜索、官网 hero/OG 图、首页第一张图、仅有站点链接或其他搜索结果自动命名为 Figure N。若走官网 HTML，必须确实核对同一个 figure DOM 块中的 img.src 与 figcaption，不能用其它区块的 Figure N 链接替代。
+- 若 PDF 和官网都无法建立这种像素-编号绑定，明确告知“无法核实 Figure N 图片”，只给已核实的图注/论文链接，不发送可能错号的图片。
+- 机械化 caption/page 校验并不能检查同一页里的多个图是否误裁，仍须视觉核对 crop 的模块/图例是否符合图注。发现错误就重新裁剪。
+
 ## 1. 获得真实图像像素
 
 1. 已获得 PDF：使用原有 extract_figures.py；检查 figures/index.json 与 _contact.png。调用 prepare_figure.py <paper-dir> 1 从索引定位图像；自动裁剪失败时从 PDF 原页手动裁剪。每张图都要肉眼查看真实像素。
@@ -14,7 +24,7 @@
 
 示例：python <skill>/scripts/prepare_figure.py <paper-dir> 1
 
-该脚本回传 image_path、page、caption、scope、ready_to_display。ready_to_display=true **只代表本地 PNG 已存在，绝不代表图片已发出**。
+该脚本回传 image_path、pdf_page、caption、caption_verified、pdf_sha256、image_sha256、scope、ready_to_display。ready_to_display=true **只代表本地 PNG 已存在，绝不代表图片已发出**。
 
 mode=整页 或自动裁图不准确时，必须检查 PDF 原页，可用 --page N --bbox X0 Y0 X1 Y1 重新裁图。不知道准确边界时可以给实际 PDF 页预览，但标注为“第N页截图，尚非精确 Figure 裁图”。
 

@@ -31,8 +31,10 @@ python <skill>/scripts/reading_bundle.py init <paper-dir> --title '<verified-tit
 只有 DOI 则用 `--doi`；无公开 ID 不传 ID。查到旧记录时先恢复 ZIP，或使用确认过的 `--paper-id` 和 `--storage-key`。`--offline` 禁止所有 HTTP/git；`--no-clone` 不是离线模式。网页/GitHub 工具取得的实际文件交给脚本，网页可读不代表本地已有 PDF。
 
 ## 图像交付协议（强制）
+指定 Figure N 的原图必须优先来自同一论文版本 PDF 的准确 caption 与页码，并从该页重新渲染；不得用官网封面或通用搜索图片配另一个图号。例：OpenWAM 三栏总览是 Figure 1 而不是 Figure 12。参见 references/figure-delivery.md。
+
 每次分析具体 Figure/Table，必须先阅读 references/figure-delivery.md。务必先找到同一篇论文的真实原图，检查像素，再通过用户可见的图片输出工具或图片组件实际在聊天中发图，然后才能写图注并讲解。不得以图像描述、URL、来源引用或 print(path) 代替图片本身。
-PDF 已在本地时先运行 python <skill>/scripts/prepare_figure.py <paper-dir> 1。返回 ready_to_display=true 只代表图片文件已准备好，不能宣称 displayed_to_user=true；取得 image_path 后还必须调用用户可见的图片工具。
+PDF 已在本地时先运行 python <skill>/scripts/prepare_figure.py <paper-dir> 1。使用校验结果中同一个 number、pdf_page、caption 与 image_path，视觉检查后实际发图。若 caption_verified 失败，不可把图号贴到另一张搜来的图片上。返回 ready_to_display=true 只代表图片文件已准备好，不能宣称 displayed_to_user=true；取得 image_path 后还必须调用用户可见的图片工具。
 如果没有用户可见图片工具，说明未能内嵌，提供已验证的图片文件下载入口，或退回真实 PDF 页预览；不得写“请看上图”。
 
 ## 开讲前

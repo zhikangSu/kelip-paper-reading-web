@@ -15,6 +15,34 @@ def norm_label(value: str) -> str:
     return re.sub(r'[.\s_-]+', '', value).casefold()
 
 
+
+def compact_caption(value):
+    return ''.join(c for c in value.casefold() if c.isalnum())
+
+
+def verify_pdf_caption(root, page_no, number, caption):
+    """Confirm the exact numbered caption begins a line on the original PDF page."""
+    import fitz
+    if not caption.strip():
+        raise ValueError('Missing Figure caption in PDF index')
+    label = r'^\s*(?:figure|fig(?:ure)?\.?|图)\s*' + re.escape(number) + r'(?![\da-z])'
+    if not re.match(label, caption, re.I):
+        raise ValueError('Index caption figure number mismatches requested Figure ' + number)
+    source = root / 'paper.pdf'
+    if not source.is_file():
+        raise ValueError('Original paper.pdf required to verify numbered figure')
+    with fitz.open(str(source)) as pdf:
+        if not 1 <= page_no <= len(pdf):
+            raise ValueError('Figure indexed page outside original PDF')
+        text = pdf[page_no - 1].get_text(sort=True)
+    expect = compact_caption(caption)[:56]
+    for match in re.finditer(label, text, re.I | re.M):
+        window = compact_caption(text[match.start():match.start()+min(500,max(180,len(caption)*3))])
+        if window.startswith(expect):
+            return True
+    return False
+
+
 def validate_png(path: Path, root: Path) -> Path:
     path = path.resolve()
     if not path.is_relative_to(root) or not path.is_file() or path.suffix.lower() != '.png':
@@ -69,34 +97,58 @@ def page_png(root: Path, label: str, page_no: int, bbox, dpi: int):
 
 
 def resolve(paper_dir, figure, *, page=None, bbox=None, dpi=220):
-    root=Path(paper_dir).resolve()
+    root = Path(paper_dir).resolve()
     if not root.is_dir():
         raise ValueError('Paper directory does not exist')
     if not 72 <= dpi <= 300:
         raise ValueError('DPI must be 72..300')
-    item=lookup(root,figure)
-    actual_page=page or (item or {}).get('page')
-    caption=(item or {}).get('caption','')
+    number = norm_label(figure)
+    if not re.fullmatch(r'\d+[a-z]?', number):
+        raise ValueError('Figure label must be an exact number')
+    item = lookup(root, number)
+    if not item:
+        raise ValueError('Figure '+number+' not indexed; do not substitute a web hero or unrelated image')
+    original_page = int(item.get('page') or 0)
+    if not original_page:
+        raise ValueError('Figure has no indexed PDF page')
+    if page is not None and page != original_page:
+        raise ValueError('Figure '+number+' indexed on PDF page '+str(original_page)+', not requested page '+str(page))
+    cached = item.get('file')
+    if cached and not (root / cached).resolve().is_relative_to(root):
+        raise ValueError('Unsafe figure index image path')
+    caption = item.get('caption', '')
+    if not verify_pdf_caption(root, original_page, number, caption):
+        raise ValueError('Figure '+number+' caption not confirmed on original PDF page '+str(original_page))
+    # Re-render pixels from verified PDF page and bounding box; do NOT trust
+    # a cache PNG or search/website hero image independently of the caption.
     if bbox:
-        if actual_page is None:
-            raise ValueError('Manual bbox requires verified PDF page number')
-        image_path,scope=page_png(root,figure,int(actual_page),bbox,dpi)
-    elif item and item.get('file') and item.get('mode') != '整页':
-        image_path,scope=validate_png(root/item['file'],root),'figure_crop'
-    elif actual_page:
-        image_path,scope=page_png(root,figure,int(actual_page),None,dpi)
+        image_path, scope = page_png(root, number, original_page, bbox, dpi)
+    elif item.get('mode') != '整页' and item.get('bbox'):
+        image_path, scope = page_png(root, number, original_page, item['bbox'], dpi)
     else:
-        raise ValueError('Figure not indexed: inspect PDF, supply --page N')
+        image_path, scope = page_png(root, number, original_page, None, dpi)
+
+    import hashlib
+    def digest(path):
+        with open(path, 'rb') as f:
+            return hashlib.file_digest(f, 'sha256').hexdigest()
     return {
-        'figure':str(figure),
-        'page':int(actual_page) if actual_page is not None else None,
-        'image_path':str(image_path),
-        'scope':scope,
-        'caption':caption,
-        'source':'paper.pdf',
-        'ready_to_display':True,
-        'displayed_to_user':False,
-        'next_action':'Render this PNG with a USER-VISIBLE image tool; a JSON/path/link is not the image.'
+        'figure': 'Figure '+number,
+        'number': number,
+        'page': original_page,
+        'pdf_page': original_page,
+        'caption': caption,
+        'caption_verified': True,
+        'image_path': str(image_path),
+        'image_sha256': digest(image_path),
+        'pdf_sha256': digest(root / 'paper.pdf'),
+        'pixel_origin': 're-rendered_from_original_pdf',
+        'scope': scope,
+        'source': 'original_pdf',
+        'ready_to_display': True,
+        'displayed_to_user': False,
+        'visual_review_required': True,
+        'next_action': 'Inspect pixels and show EXACTLY this file to user; copy figure number/caption from the same result. Never relabel a separately searched image.'
     }
 
 
