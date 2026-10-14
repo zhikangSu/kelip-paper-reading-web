@@ -30,6 +30,11 @@ python <skill>/scripts/reading_bundle.py init <paper-dir> --title '<verified-tit
 
 只有 DOI 则用 `--doi`；无公开 ID 不传 ID。查到旧记录时先恢复 ZIP，或使用确认过的 `--paper-id` 和 `--storage-key`。`--offline` 禁止所有 HTTP/git；`--no-clone` 不是离线模式。网页/GitHub 工具取得的实际文件交给脚本，网页可读不代表本地已有 PDF。
 
+## 图像交付协议（强制）
+每次分析具体 Figure/Table，必须先阅读 references/figure-delivery.md。务必先找到同一篇论文的真实原图，检查像素，再通过用户可见的图片输出工具或图片组件实际在聊天中发图，然后才能写图注并讲解。不得以图像描述、URL、来源引用或 print(path) 代替图片本身。
+PDF 已在本地时先运行 python <skill>/scripts/prepare_figure.py <paper-dir> 1。返回 ready_to_display=true 只代表图片文件已准备好，不能宣称 displayed_to_user=true；取得 image_path 后还必须调用用户可见的图片工具。
+如果没有用户可见图片工具，说明未能内嵌，提供已验证的图片文件下载入口，或退回真实 PDF 页预览；不得写“请看上图”。
+
 ## 开讲前
 
 读元数据、摘要/引言/方法和图表索引；亲眼检查 teaser 和总览图。长文按关键章节分批，不用摘要代替全文。坏图先修，材料不足说明覆盖范围。读一次 [examples.md](references/examples.md) 对齐原版讲解深度；其中数字只是示例，不是当前论文证据。代码先扫 README、forward、loss、dataset/transform、推理入口，详细核对留到对应阶段。
@@ -63,7 +68,7 @@ python <skill>/scripts/reading_bundle.py init <paper-dir> --title '<verified-tit
 
 ## 图、公式和引用
 
-图必须亲眼看过，并实际在聊天显示；不能只给绝对路径。只能给下载时说明。`crop.py <pdf> --page N x0 y0 x1 y1 -o <png>` 的 N 从 1 开始，比例坐标 0–1。原图/公式需保真，不用生成图替代证据。
+图必须亲眼看过，并依 figure-delivery.md 使用用户可见工具真正显示；仅有图注、网页链接、路径均不算成功。无法展示时明确说明，不能假装已经发图。`crop.py <pdf> --page N x0 y0 x1 y1 -o <png>` 的 N 从 1 开始，比例坐标 0–1。原图/公式需保真，不用生成图替代证据。
 
 聊天正常渲染公式，配符号表和数字。离线报告支持 `$...$` 和独占行 `$$` 公式块，转本地 MathML；复杂式子裁原式 PNG。转换失败须修复或说明，不伪称渲染成功。翻译及引用遵守平台规则，不大段复制原论文。
 

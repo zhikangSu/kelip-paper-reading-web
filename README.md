@@ -31,6 +31,10 @@ GitHub Actions 自动测试并产出安装包、源码包和测试日志，可�
 
 默认一站一站讲，可打断和跳站。结束或暂停时询问一次是否归档；已经明确要求保存就直接执行，不每轮自动上传。部分完成也可保存。
 
+## 图像展示改进（v0.2.1）
+增加 references/figure-delivery.md 与 scripts/prepare_figure.py：论文 Figure 必须先显示原始图像，再讲内容。脚本从 figures/index.json 定位 PNG，自动裁剪不准时支持 PDF 页预览和手动坐标重裁。
+引用链接、路径或图注不能当作图片已经发送。若平台当前没有用户可见的图像输出工具，必须明确告知未内嵌图片并提供已验证图片附件。prepared != displayed。
+
 ## 存储
 
 ```text
@@ -55,6 +59,7 @@ ZIP 保存报告、问答、阅读位置、已取得 PDF/LaTeX/图表/代码及�
 - references/：原版讲解样例/笔记模板，以及运行时和归档协议。
 - fetch_paper.py：真正的 --offline 入口；保留 upstream_fetch_paper.py 原版实现并适配边界。
 - extract_figures.py / crop.py：保留原版裁图工具。
+- prepare_figure.py：检查自动裁图并输出可发送的真实 PNG；最终仍须通过图片展示工具呈现。
 - paper_identity.py：标识规范化与身份保持。
 - render_report.py：图像内嵌、MathML、自包含 HTML 和问答交互。
 - reading_bundle.py：初始化、构建、校验、安全恢复。
